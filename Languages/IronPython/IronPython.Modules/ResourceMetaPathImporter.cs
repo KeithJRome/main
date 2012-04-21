@@ -89,8 +89,7 @@ fully qualified (dotted) module name. It returns the imported
 module, or raises ResourceImportError if it wasn't found."
             )]
         public object load_module(CodeContext /*!*/ context, string fullname) {
-            dynamic sys = context.LanguageContext.SystemState;
-            PythonDictionary modules = sys.modules;
+            var modules = (PythonDictionary)context.LanguageContext.SystemState.__dict__.get("modules");
             if (modules.Contains(fullname))
                 return modules[fullname];
 
@@ -253,7 +252,7 @@ module, or raises ResourceImportError if it wasn't found."
                 try {
                     var parsedSources =
                         from entry in files.Values
-                        let isPyFile = entry.FullName.EndsWith(".py", true, CultureInfo.InvariantCulture)
+                        let isPyFile = entry.FullName.EndsWith(".py", StringComparison.InvariantCultureIgnoreCase)
                         where isPyFile
                         let name = entry.FullName.Substring(0, entry.FullName.Length - 3)
                         let dottedName = name.Replace('\\', '.').Replace('/', '.')
